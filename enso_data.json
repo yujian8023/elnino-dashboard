@@ -1,0 +1,33 @@
+{
+  "enso": {
+    "status": "neutral",
+    "nino34": 0.4,
+    "nino4": 0.5,
+    "nino12": 0.5,
+    "forecast": [
+      {
+        "probability": 82,
+        "period": "May-July 2026"
+      },
+      {
+        "probability": 96,
+        "period": "Dec 2026-Feb 2027"
+      }
+    ],
+    "update_time": "2026-06-07 00:59:14",
+    "source": "CPC/NOAA"
+  },
+  "power": {
+    "south_china_max_load": 2.75,
+    "yoy_increase": 1858.0,
+    "yoy_pct": 7.24,
+    "power_consumption_growth": 8.1,
+    "peak_date_start": "5月25日",
+    "peak_date_end": "5月28日",
+    "peak_period": "2026年5月25日—5月28日",
+    "publish_date": "2026-06-02",
+    "update_time": "2026-06-07 00:59:14",
+    "source": "NEA/国家能源局"
+  },
+  "update_time": "2026-06-07 00:59:14"
+}

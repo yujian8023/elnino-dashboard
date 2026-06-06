@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>厄尔尼诺 + 用电负荷 + 期货 实时监控</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Noto Sans SC', sans-serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .data-value {
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 标题 -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-2">🌡️ 厄尔尼诺 + ⚡ 用电 + 📈 期货 实时监控</h1>
+            <p class="text-gray-400">El Niño & Power Load & Futures Real-time Dashboard</p>
+            <p id="updateTime" class="text-xs text-gray-500 mt-2"></p>
+        </div>
+
+        <!-- 核心数据网格 -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <!-- 厄尔尼诺数据 -->
+            <div class="card rounded-2xl p-5">
+                <h2 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-xl mr-2">🌊</span>
+                    厄尔尼诺 (ENSO)
+                </h2>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">状态</span>
+                        <span id="ensoStatus" class="font-bold text-yellow-400">--</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Niño-3.4</span>
+                        <span id="nino34" class="data-value">--°C</span>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-gray-700">
+                        <span class="text-gray-400 text-xs">预测概率</span>
+                        <div id="forecast" class="text-xs mt-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用电负荷数据 -->
+            <div class="card rounded-2xl p-5">
+                <h2 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-xl mr-2">⚡</span>
+                    南方用电负荷
+                </h2>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">最大负荷</span>
+                        <span id="maxLoad" class="data-value">--亿千瓦</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">峰值时间</span>
+                        <span id="peakPeriod" class="text-green-400">--</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">同比增长</span>
+                        <span id="yoyIncrease">--</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">用电量增长</span>
+                        <span id="powerGrowth">--%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 期货数据 -->
+            <div class="card rounded-2xl p-5">
+                <h2 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-xl mr-2">📈</span>
+                    大宗商品期货
+                    <span class="text-xs text-gray-500 ml-auto">API: 百度财经</span>
+                </h2>
+                <div id="futuresContainer">
+                    <div class="text-center text-yellow-400 py-4">⚠️ 期货API维护中</div>
+                    <p class="text-gray-500 text-xs text-center">百度财经API返回500，暂时不可用</p>
+                    <div class="text-center mt-3">
+                        <button onclick="testFutures()" class="text-blue-400 text-sm hover:underline">🔄 重试API</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据来源 -->
+        <div class="text-center text-xs text-gray-500 mt-4">
+            <p>数据来源: CPC/NOAA | 国家能源局 | 百度财经</p>
+            <p class="mt-1">🔄 <span id="lastUpdate">--</span></p>
+        </div>
+
+        <!-- 刷新按钮 -->
+        <div class="text-center mt-4">
+            <button onclick="loadAllData()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-full text-sm transition">
+                🔄 刷新数据
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 测试期货API
+        async function testFutures() {
+            try {
+                const res = await fetch('https://finance.pae.baidu.com/sapi/v1/contracts?product=cu');
+                const data = await res.json();
+                alert('API响应: ' + JSON.stringify(data));
+            } catch (e) {
+                alert('API错误: ' + e.message);
+            }
+        }
+
+        // 加载ENSO和用电负荷数据
+        async function loadENSOPower() {
+            try {
+                const response = await fetch('enso_data.json');
+                const data = await response.json();
+                
+                document.getElementById('updateTime').textContent = '更新时间: ' + data.update_time;
+                document.getElementById('lastUpdate').textContent = data.update_time;
+                
+                // ENSO数据
+                if (data.enso && !data.enso.error) {
+                    const statusMap = { 'neutral': '🌡️ 中性', 'warm': '🔴 厄尔尼诺', 'cold': '🔵 拉尼娜' };
+                    document.getElementById('ensoStatus').textContent = statusMap[data.enso.status] || data.enso.status;
+                    document.getElementById('nino34').textContent = (data.enso.nino34 || '--') + '°C';
+                    
+                    const forecastHtml = (data.enso.forecast || []).map(f => 
+                        `<div class="flex justify-between"><span>${f.period}</span><span class="text-yellow-400">${f.probability}%</span></div>`
+                    ).join('');
+                    document.getElementById('forecast').innerHTML = forecastHtml || '暂无预测';
+                }
+                
+                // 用电负荷数据
+                if (data.power && !data.power.error) {
+                    document.getElementById('maxLoad').textContent = data.power.south_china_max_load + '亿千瓦';
+                    document.getElementById('peakPeriod').textContent = data.power.peak_period || '--';
+                    document.getElementById('yoyIncrease').textContent = '+' + data.power.yoy_increase + '万千瓦 (' + data.power.yoy_pct + '%)';
+                    document.getElementById('powerGrowth').textContent = data.power.power_consumption_growth + '%';
+                }
+                
+            } catch (e) {
+                console.error('加载数据失败:', e);
+            }
+        }
+
+        // 加载全部数据
+        async function loadAllData() {
+            await loadENSOPower();
+        }
+        
+        // 页面加载时获取数据
+        loadAllData();
+        
+        // 每5分钟自动刷新
+        setInterval(loadAllData, 300000);
+    </script>
+</body>
+</html>
