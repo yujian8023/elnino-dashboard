@@ -219,13 +219,29 @@
             }
         }
 
-        // 加载板块数据 (Tushare)
+        // 加载板块数据
         async function loadSectors() {
-            // TODO: 实现Tushare API调用
-            const tbody = document.getElementById('sectors');
-            tbody.innerHTML = `
-                <tr><td colspan="3" class="text-center text-yellow-400 py-4">⚠️ 待接入Tushare</td></tr>
-            `;
+            try {
+                const res = await fetch('stock_data.json');
+                const data = await res.json();
+                const tbody = document.getElementById('sectors');
+                const sectors = data.sectors || [];
+                if (sectors.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-yellow-400 py-4">⚠️ 数据获取中...</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = sectors.map(s => `
+                    <tr class="border-b border-gray-800">
+                        <td class="text-left py-2">${s.name}</td>
+                        <td class="text-right py-2 ${s.change >= 0 ? 'text-green-400' : 'text-red-400'}">${s.change >= 0 ? '+' : ''}${s.change}%</td>
+                        <td class="text-right py-2 text-gray-400">${(s.volume/100000000).toFixed(1)}亿</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('板块加载失败:', e);
+                const tbody = document.getElementById('sectors');
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-red-400 py-4">⚠️ 加载失败</td></tr>';
+            }
         }
 
         // 历史经验
