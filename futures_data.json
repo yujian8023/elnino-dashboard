@@ -1,0 +1,41 @@
+{
+  "update_time": "2026-06-07T08:55:18.581654",
+  "futures": [
+    {
+      "name": "沥青主连",
+      "price": "4385.00",
+      "change": "+1.13%",
+      "status": "up"
+    },
+    {
+      "name": "纸浆主连",
+      "price": "4856.00",
+      "change": "+0.66%",
+      "status": "up"
+    },
+    {
+      "name": "热卷主连",
+      "price": "3394.00",
+      "change": "+0.47%",
+      "status": "up"
+    },
+    {
+      "name": "线材主连",
+      "price": "3367.00",
+      "change": "+0.45%",
+      "status": "up"
+    },
+    {
+      "name": "沪铅主连",
+      "price": "16395.00",
+      "change": "-0.03%",
+      "status": "down"
+    },
+    {
+      "name": "不锈钢主连",
+      "price": "14625.00",
+      "change": "-0.14%",
+      "status": "down"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+name: Update Futures Data
+
+on:
+  schedule:
+    - cron: '0 1,9 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get futures data
+        run: |
+          python3 << 'PYEOF'
+import requests
+import json
+from datetime import datetime
+
+url = "https://finance.pae.baidu.com/sapi/v1/contracts"
+params = {
+    "code": "RB888",
+    "market": "ab",
+    "dataType": "exchange",
+    "pn": 0,
+    "rn": 6,
+    "finClientType": "pc"
+}
+headers = {
+    "Origin": "https://finance.baidu.com",
+    "Referer": "https://finance.baidu.com/",
+    "User-Agent": "Mozilla/5.0"
+}
+
+try:
+    resp = requests.get(url, params=params, headers=headers, timeout=15)
+    data = resp.json()
+    list = data.get('Result', {}).get('contracts', {}).get('list', [])
+    result = []
+    for c in list:
+        result.append({
+            'name': c.get('name', ''),
+            'price': c.get('price', {}).get('value', ''),
+            'change': c.get('ratio', {}).get('value', ''),
+            'status': c.get('price', {}).get('status', '')
+        })
+    with open('futures_data.json', 'w') as f:
+        json.dump({'update_time': datetime.now().isoformat(), 'futures': result}, f, ensure_ascii=False, indent=2)
+    print(f"Updated {len(result)} futures")
+except Exception as e:
+    print(f"Error: {e}")
+    with open('futures_data.json', 'w') as f:
+        json.dump({'update_time': '', 'futures': []}, f)
+PYEOF
+
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update futures data"
+          file_pattern: "futures_data.json"

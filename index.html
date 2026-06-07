@@ -282,15 +282,13 @@
             warning.innerHTML = `<p>${text}</p>`;
         }
 
-        // 加载期货数据 (百度财经)
+        // 加载期货数据
         async function loadFutures() {
             const futuresDiv = document.getElementById('futures');
             try {
-                const res = await fetch(
-                    'https://finance.pae.baidu.com/sapi/v1/contracts?code=RB888&market=ab&dataType=exchange&pn=0&rn=6&finClientType=pc'
-                );
-                const json = await res.json();
-                const list = json.Result?.contracts?.list || [];
+                const res = await fetch('futures_data.json');
+                const data = await res.json();
+                const list = data.futures || [];
                 if (list.length === 0) {
                     futuresDiv.innerHTML = '<div class="text-center text-gray-400">暂无数据</div>';
                     return;
@@ -298,8 +296,8 @@
                 futuresDiv.innerHTML = list.map(c => `
                     <div class="bg-gray-800 rounded-lg p-2 text-center">
                         <div class="text-xs text-gray-400">${c.name}</div>
-                        <div class="text-sm font-bold ${c.price.status === 'up' ? 'text-red-400' : 'text-green-400'}">${c.price.value}</div>
-                        <div class="text-xs ${c.ratio.status === 'up' ? 'text-red-400' : 'text-green-400'}">${c.ratio.value}</div>
+                        <div class="text-sm font-bold ${c.status === 'up' ? 'text-red-400' : 'text-green-400'}">${c.price}</div>
+                        <div class="text-xs ${c.status === 'up' ? 'text-red-400' : 'text-green-400'}">${c.change}</div>
                     </div>
                 `).join('');
             } catch (e) {
