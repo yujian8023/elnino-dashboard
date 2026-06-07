@@ -124,6 +124,14 @@
             </div>
         </div>
 
+        <!-- 个股行情 -->
+        <div class="card rounded-xl p-4 mb-4">
+            <h2 class="text-lg font-bold mb-3">📈 个股机会</h2>
+            <div id="stocks" class="grid grid-cols-4 gap-2">
+                <div class="text-center text-gray-400">加载中...</div>
+            </div>
+        </div>
+
         <!-- 历史经验 + 风险提示 -->
         <div class="card rounded-xl p-4 mb-4">
             <h2 class="text-lg font-bold mb-3">📚 历史经验回顾</h2>
@@ -293,6 +301,7 @@
                     futuresDiv.innerHTML = '<div class="text-center text-gray-400">暂无数据</div>';
                     return;
                 }
+                // 按品类分组显示
                 futuresDiv.innerHTML = list.map(c => `
                     <div class="bg-gray-800 rounded-lg p-2 text-center">
                         <div class="text-xs text-gray-400">${c.name}</div>
@@ -306,9 +315,35 @@
             }
         }
 
+        // 加载个股数据
+        async function loadStocks() {
+            const stocksDiv = document.getElementById('stocks');
+            try {
+                const res = await fetch('stock_data.json');
+                const data = await res.json();
+                const list = data.stocks || [];
+                if (list.length === 0) {
+                    stocksDiv.innerHTML = '<div class="text-center text-gray-400">暂无数据</div>';
+                    return;
+                }
+                stocksDiv.innerHTML = list.map(s => `
+                    <div class="bg-gray-800 rounded-lg p-2 text-center">
+                        <div class="text-xs text-blue-400">${s.category}</div>
+                        <div class="text-xs font-bold text-white">${s.name}</div>
+                        <div class="text-xs text-gray-400">${s.code}</div>
+                        <div class="text-sm font-bold ${parseFloat(s.change) >= 0 ? 'text-red-400' : 'text-green-400'}">${s.price}</div>
+                        <div class="text-xs ${parseFloat(s.change) >= 0 ? 'text-red-400' : 'text-green-400'}">${s.pct}</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('个股加载失败:', e);
+                stocksDiv.innerHTML = '<div class="text-center text-red-400">加载失败</div>';
+            }
+        }
+
         // 加载全部数据
         async function loadAllData() {
-            await Promise.all([loadWeather(), loadENSOPower(), loadSectors(), loadFutures()]);
+            await Promise.all([loadWeather(), loadENSOPower(), loadSectors(), loadFutures(), loadStocks()]);
             loadHistory();
             loadWarning();
         }
