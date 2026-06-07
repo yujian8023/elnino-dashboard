@@ -1,15 +1,40 @@
 {
-  "update_time": "2026-06-07T14:00:00",
+  "update_time": "2026-06-08T00:01:41.254627",
   "futures": [
-    {"category": "白糖", "name": "白糖主连", "price": "7120", "change": "+0.85%", "status": "up"},
-    {"category": "白糖", "name": "白糖2409", "price": "7080", "change": "+0.71%", "status": "up"},
-    {"category": "橡胶", "name": "橡胶主连", "price": "15745", "change": "+1.20%", "status": "up"},
-    {"category": "橡胶", "name": "橡胶2409", "price": "15680", "change": "+1.15%", "status": "up"},
-    {"category": "棕榈油", "name": "棕榈油主连", "price": "7856", "change": "+0.92%", "status": "up"},
-    {"category": "棕榈油", "name": "棕榈油2409", "price": "7820", "change": "+0.88%", "status": "up"},
-    {"category": "棉花", "name": "棉花主连", "price": "14690", "change": "-0.27%", "status": "down"},
-    {"category": "棉花", "name": "棉花2409", "price": "14720", "change": "-0.20%", "status": "down"},
-    {"category": "豆粕", "name": "豆粕主连", "price": "2987", "change": "-0.30%", "status": "down"},
-    {"category": "玉米", "name": "玉米主连", "price": "2318", "change": "+0.04%", "status": "up"}
+    {
+      "category": "豆粕",
+      "name": "豆粕主连",
+      "price": "3111",
+      "change": "+0.88%",
+      "status": "up"
+    },
+    {
+      "category": "橡胶",
+      "name": "橡胶主连",
+      "price": "14520",
+      "change": "+0.38%",
+      "status": "up"
+    },
+    {
+      "category": "白糖",
+      "name": "白糖主连",
+      "price": "6128",
+      "change": "-0.24%",
+      "status": "down"
+    },
+    {
+      "category": "玉米",
+      "name": "玉米主连",
+      "price": "2388",
+      "change": "+0.29%",
+      "status": "up"
+    },
+    {
+      "category": "豆油",
+      "name": "豆油主连",
+      "price": "7630",
+      "change": "+0.24%",
+      "status": "up"
+    }
   ]
 }
