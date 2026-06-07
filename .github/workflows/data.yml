@@ -24,6 +24,7 @@ jobs:
 import requests
 import json
 import os
+from datetime import datetime
 
 # 东方财富板块数据
 url = "https://push2.eastmoney.com/api/qt/clist/get"
@@ -58,7 +59,7 @@ try:
                 break
     # 保存
     with open('stock_data.json', 'w') as f:
-        json.dump({'update_time': strdatetime.now().isoformat(), 'sectors': result}, f, ensure_ascii=False)
+        json.dump({'update_time': datetime.now().isoformat(), 'sectors': result}, f, ensure_ascii=False)
     print(f"Updated {len(result)} sectors")
 except Exception as e:
     print(f"Error: {e}")
