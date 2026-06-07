@@ -1,0 +1,13 @@
+{
+  "update_time": "2026-06-07T00:30:00",
+  "sectors": [
+    {"name": "农林牧渔", "change": 2.35, "volume": 2856000000},
+    {"name": "电力", "change": -1.28, "volume": 1589000000},
+    {"name": "家电", "change": 0.85, "volume": 980000000},
+    {"name": "有色金属", "change": -2.15, "volume": 2340000000},
+    {"name": "水利工程", "change": 1.56, "volume": 450000000},
+    {"name": "钢铁", "change": -0.78, "volume": 1200000000},
+    {"name": "化工", "change": -1.45, "volume": 1890000000},
+    {"name": "煤炭", "change": 0.32, "volume": 890000000}
+  ]
+}
