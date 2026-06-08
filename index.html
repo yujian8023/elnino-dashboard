@@ -282,7 +282,7 @@
                 }
                 stocksDiv.innerHTML = list.map(s => {
                     const code = s.code;
-                    const url = `https://finance.sina.com.cn/stock/quote/${code}.html`;
+                    const url = `https://finance.sina.com.cn/realstock/company/${code}.html`;
                     return `
                         <a href="${url}" target="_blank" class="block bg-gray-800 rounded-lg p-2 text-center hover:bg-gray-700 transition">
                             <div class="text-xs text-blue-400">${s.category}</div>
