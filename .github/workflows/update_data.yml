@@ -2,8 +2,8 @@ name: Update Market Data
 
 on:
   schedule:
-    # 每天9:00-15:00每隔30分钟更新（A股交易时段）
-    - cron: '0,30 9-14 * * 1-5'
+    # 每天23:30更新（北京时间）
+    - cron: '30 15 * * *'
   workflow_dispatch:
 
 jobs:
