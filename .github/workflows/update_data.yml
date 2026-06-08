@@ -1,0 +1,31 @@
+name: Update Market Data
+
+on:
+  schedule:
+    # 每天9:00-15:00每隔30分钟更新（A股交易时段）
+    - cron: '0,30 9-14 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Update data
+        run: |
+          pip install requests
+          python update_data.py
+      
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --quiet || git commit -m "Update market data"
+          git push
