@@ -97,24 +97,7 @@
             </div>
         </div>
 
-        <!-- 板块行情 -->
-        <div class="card rounded-xl p-4 mb-4">
-            <h2 class="text-lg font-bold mb-3">📈 板块行情</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="text-gray-400">
-                            <th class="text-left py-2">板块</th>
-                            <th class="text-right py-2">涨跌幅</th>
-                            <th class="text-right py-2">成交量</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sectors" class="sectors-data">
-                        <tr><td colspan="3" class="text-center text-gray-500 py-4">加载中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
 
         <!-- 期货行情 -->
         <div class="card rounded-xl p-4 mb-4">
@@ -164,21 +147,6 @@
             harbin: { name: '哈尔滨', lat: 45.8, lon: 126.5 }
         };
 
-        // 板块列表
-        const sectors = [
-            { code: '801010', name: '农林牧渔' },
-            { code: '801020', name: '采掘' },
-            { code: '801030', name: '化工' },
-            { code: '801040', name: '钢铁' },
-            { code: '801050', name: '有色金属' },
-            { code: '801080', name: '电气设备' },
-            { code: '801100', name: '泛金融' },
-            { code: '801110', name: '军工' },
-            { code: '801120', name: '电子' },
-            { code: '801150', name: '电力' },
-            { code: '801160', name: '公用事业' },
-            { code: '801210', name: '房地产' }
-        ];
 
         // 加载天气数据
         async function loadWeather() {
@@ -235,30 +203,6 @@
             }
         }
 
-        // 加载板块数据
-        async function loadSectors() {
-            try {
-                const res = await fetch('stock_data.json');
-                const data = await res.json();
-                const tbody = document.getElementById('sectors');
-                const sectors = data.sectors || [];
-                if (sectors.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-yellow-400 py-4">⚠️ 数据获取中...</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = sectors.map(s => `
-                    <tr class="border-b border-gray-800">
-                        <td class="text-left py-2">${s.name}</td>
-                        <td class="text-right py-2 ${s.change >= 0 ? 'text-green-400' : 'text-red-400'}">${s.change >= 0 ? '+' : ''}${s.change}%</td>
-                        <td class="text-right py-2 text-gray-400">${(s.volume/100000000).toFixed(1)}亿</td>
-                    </tr>
-                `).join('');
-            } catch (e) {
-                console.error('板块加载失败:', e);
-                const tbody = document.getElementById('sectors');
-                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-red-400 py-4">⚠️ 加载失败</td></tr>';
-            }
-        }
 
         // 历史经验
         function loadHistory() {
@@ -291,6 +235,12 @@
         }
 
         // 加载期货数据
+        // 期货代码映射
+        const futureLinks = {
+            '豆粕': 'M0', '橡胶': 'RU0', '白糖': 'SR0', '玉米': 'C0', '豆油': 'Y0',
+            '铜': 'CU0', '铝': 'AL0', '白银': 'AG0', '黄金': 'AU0', '螺纹钢': 'RB0'
+        };
+
         async function loadFutures() {
             const futuresDiv = document.getElementById('futures');
             try {
@@ -301,14 +251,18 @@
                     futuresDiv.innerHTML = '<div class="text-center text-gray-400">暂无数据</div>';
                     return;
                 }
-                // 按品类分组显示
-                futuresDiv.innerHTML = list.map(c => `
-                    <div class="bg-gray-800 rounded-lg p-2 text-center">
-                        <div class="text-xs text-gray-400">${c.name}</div>
-                        <div class="text-sm font-bold ${c.status === 'up' ? 'text-red-400' : 'text-green-400'}">${c.price}</div>
-                        <div class="text-xs ${c.status === 'up' ? 'text-red-400' : 'text-green-400'}">${c.change}</div>
-                    </div>
-                `).join('');
+                // 按品类分组显示，带链接
+                futuresDiv.innerHTML = list.map(c => {
+                    const code = futureLinks[c.category] || c.category;
+                    const url = `https://finance.sina.com.cn/futures/quotes/${code}.shtml`;
+                    return `
+                        <a href="${url}" target="_blank" class="block bg-gray-800 rounded-lg p-2 text-center hover:bg-gray-700 transition">
+                            <div class="text-xs text-gray-400">${c.name}</div>
+                            <div class="text-sm font-bold ${c.status === 'up' ? 'text-red-400' : 'text-green-400'}">${c.price}</div>
+                            <div class="text-xs ${c.status === 'up' ? 'text-red-400' : 'text-green-400'}">${c.change}</div>
+                        </a>
+                    `;
+                }).join('');
             } catch (e) {
                 console.error('期货加载失败:', e);
                 futuresDiv.innerHTML = '<div class="text-center text-red-400">加载失败</div>';
@@ -326,15 +280,19 @@
                     stocksDiv.innerHTML = '<div class="text-center text-gray-400">暂无数据</div>';
                     return;
                 }
-                stocksDiv.innerHTML = list.map(s => `
-                    <div class="bg-gray-800 rounded-lg p-2 text-center">
-                        <div class="text-xs text-blue-400">${s.category}</div>
-                        <div class="text-xs font-bold text-white">${s.name}</div>
-                        <div class="text-xs text-gray-400">${s.code}</div>
-                        <div class="text-sm font-bold ${parseFloat(s.change) >= 0 ? 'text-red-400' : 'text-green-400'}">${s.price}</div>
-                        <div class="text-xs ${parseFloat(s.change) >= 0 ? 'text-red-400' : 'text-green-400'}">${s.pct}</div>
-                    </div>
-                `).join('');
+                stocksDiv.innerHTML = list.map(s => {
+                    const code = s.code;
+                    const url = `https://finance.sina.com.cn/stock/quote/${code}.html`;
+                    return `
+                        <a href="${url}" target="_blank" class="block bg-gray-800 rounded-lg p-2 text-center hover:bg-gray-700 transition">
+                            <div class="text-xs text-blue-400">${s.category}</div>
+                            <div class="text-xs font-bold text-white">${s.name}</div>
+                            <div class="text-xs text-gray-400">${s.code}</div>
+                            <div class="text-sm font-bold ${parseFloat(s.change) >= 0 ? 'text-red-400' : 'text-green-400'}">${s.price}</div>
+                            <div class="text-xs ${parseFloat(s.change) >= 0 ? 'text-red-400' : 'text-green-400'}">${s.pct}</div>
+                        </a>
+                    `;
+                }).join('');
             } catch (e) {
                 console.error('个股加载失败:', e);
                 stocksDiv.innerHTML = '<div class="text-center text-red-400">加载失败</div>';
@@ -343,7 +301,7 @@
 
         // 加载全部数据
         async function loadAllData() {
-            await Promise.all([loadWeather(), loadENSOPower(), loadSectors(), loadFutures(), loadStocks()]);
+            await Promise.all([loadWeather(), loadENSOPower(), loadFutures(), loadStocks()]);
             loadHistory();
             loadWarning();
         }
