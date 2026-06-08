@@ -254,26 +254,16 @@
                     return;
                 }
                 // 按品类分组显示，带链接
-                futuresDiv.innerHTML = '<div id="futuresKlineChart" style="width:100%;height:300px;"></div>';
-                if (list.length > 0) {
-                    const code = futureLinks[list[0].category] || list[0].category;
-                    fetch('https://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesDailyKLine?symbol=' + code)
-                    .then(r => r.json())
-                    .then(klineData => {
-                        if (!klineData || klineData.length === 0) return;
-                        const data = klineData.slice(-30);
-                        const dates = data.map(d => d[0]);
-                        const ohlc = data.map(d => [parseFloat(d[1]), parseFloat(d[4]), parseFloat(d[3]), parseFloat(d[2])]);
-                        const chart = echarts.init(document.getElementById('futuresKlineChart'));
-                        chart.setOption({
-                            backgroundColor: 'transparent',
-                            grid: { left: 50, right: 20, top: 20, bottom: 80 },
-                            xAxis: { type: 'category', data: dates, axisLabel: { color: '#9ca3af' } },
-                            yAxis: { scale: true, axisLabel: { color: '#9ca3af' }, splitLine: { lineStyle: { color: '#374151' } },
-                            series: [{ type: 'candlestick', data: ohlc, itemStyle: { color: '#ef4444', color0: '#22c55e', borderColor: '#ef4444', borderColor0: '#22c55e' } }]
-                        });
-                    }).catch(() => {});
-                }
+                // 期货显示为链接列表（因为免费API数据旧）
+                futuresDiv.innerHTML = list.map(c => {
+                    const code = futureLinks[c.category] || c.category;
+                    const url = "https://finance.sina.com.cn/futures/quotes/" + code + ".shtml";
+                    return '<a href="' + url + '" target="_blank" class="block bg-gray-800 rounded-lg p-2 text-center hover:bg-gray-700 transition">' +
+                        '<div class="text-xs text-gray-400">' + c.name + '</div>' +
+                        '<div class="text-sm font-bold ' + (c.status === "up" ? "text-red-400" : "text-green-400") + '">' + c.price + '</div>' +
+                        '<div class="text-xs ' + (c.status === "up" ? "text-red-400" : "text-green-400") + '">' + c.change + '</div>' +
+                    '</a>';
+                }).join('');
             } catch (e) {
                 console.error('期货加载失败:', e);
                 futuresDiv.innerHTML = '<div class="text-center text-red-400">加载失败</div>';
